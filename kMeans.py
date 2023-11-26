@@ -1,8 +1,8 @@
 # Import necessary libraries
 import pandas as pd
 import numpy as np
-import formulas
-import scipy
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
 
 irisDataFile = open("iris_data/iris.data")
 datalines = irisDataFile.readlines()
@@ -22,72 +22,26 @@ while i < len(rawDataVals):
 
 dataframe = pd.DataFrame(formattedDataVals, columns=dataLabels)
 
-traningData = dataframe.sample(frac=.8)
-testData = dataframe.drop(traningData.index)
 
-# resample data until the testData has at least one of each class
-while not ("Iris-setosa" in testData["class"].values and "Iris-versicolor" in testData["class"].values and "Iris-virginica" in testData["class"].values):
-    print("Retrying selection of traning and validation data")
-    traningData = dataframe.sample(frac=.8)
-    testData = dataframe.drop(traningData.index)
+# Format the data for use in KMeans
 
-def getTrainedThetas(dataframe, yLabel):
-    theta = np.zeros(len(dataLabels), np.float32)
+kFrame = dataframe.drop(columns="class")
+kMatrix = kFrame.values
 
-    trainingX = dataframe[["sepal_length", "sepal_width", "petal_length", "petal_width"]]
-    trainingX = np.array(trainingX.values)
-    trainingX = np.concatenate(((np.ones((trainingX.shape[0], 1), dtype=trainingX.dtype)), trainingX), axis=1)
+kmeans = KMeans(n_clusters=3, init="random", n_init=1).fit(kMatrix)
 
-    trainingY = dataframe[["class"]]
-    trainingY = trainingY.apply(lambda col: [1 if val == yLabel else 0 for val in col], raw=True)
-    trainingY = np.array(trainingY.values)
+c1 = []
+c2 = []
+c3 = []
 
-    res = scipy.optimize.minimize(formulas.cost, theta, (trainingX, trainingY), jac=True)
+for index, val in enumerate(kmeans.labels_):
+    if (val == 0):
+        plt.scatter(x=kFrame["sepal_length"].values[index], y=kFrame["sepal_width"].values[index], c='r')
+    elif (val == 1):
+        plt.scatter(x=kFrame["sepal_length"].values[index], y=kFrame["sepal_width"].values[index], c='g')
+    elif (val == 2):
+        plt.scatter(x=kFrame["sepal_length"].values[index], y=kFrame["sepal_width"].values[index], c='b')
 
-    return res["x"]
-
-def getValidationResults(dataframe, yLabel):
-    resultData = []
-    validX = dataframe[["sepal_length", "sepal_width", "petal_length", "petal_width"]]
-    validX = np.array(validX.values)
-    validX = np.concatenate(((np.ones((validX.shape[0], 1), dtype=validX.dtype)), validX), axis=1)
-    validY = dataframe[["class"]]
-    validY = validY.apply(lambda col: [1 if val == yLabel else 0 for val in col], raw=True)
-    validY = np.array(validY.values)
-
-    for y in enumerate(validY):
-        resultData.append(0 if formulas.hypothesis(validX[y[0]], trainedThetas) < 0.5 else 1)
-        #print(f"Result Data: {resultData[y[0]]}, Actual Data: {y[1]}, Equal: {resultData[y[0]] == y[1]}")
-
-    tp, fp, tn, fn = formulas.confusionMatrix(resultData, validY)
-    return tp, fp, tn, fn
-
-def printPredictionResults(label, trainedThetas, tp, fp, tn, fn):
-    print(f"{label} vs Others:\n   Accuracy          : {formulas.accuracy(tp, fp, tn, fn)}\n   Precision         : {formulas.precision(tp, fp)}")
-    print(f"   Optimal Theta     : {trainedThetas}")
-    print(f"   Confusion matrix values:\n      True Positive  : {tp}\n      True Negative  : {tn}\n      False Positive : {fp}\n      False Negative : {fn}")
-
-
-##########################################################################################################
-#                                               TEST CASES                                               #
-##########################################################################################################
-
-print("\n")
-
-trainedThetas = getTrainedThetas(traningData, "Iris-setosa")
-tp, fp, tn, fn = getValidationResults(testData, "Iris-setosa")
-printPredictionResults("Iris-setosa", trainedThetas, tp, fp, tn, fn)
-
-print("\n")
-
-trainedThetas = getTrainedThetas(traningData, "Iris-versicolor")
-tp, fp, tn, fn = getValidationResults(testData, "Iris-versicolor")
-printPredictionResults("Iris-versicolor", trainedThetas, tp, fp, tn, fn)
-
-print("\n")
-
-trainedThetas = getTrainedThetas(traningData, "Iris-virginica")
-tp, fp, tn, fn = getValidationResults(testData, "Iris-virginica")
-printPredictionResults("Iris-virginica", trainedThetas, tp, fp, tn, fn)
-
-print("\n")
+for index, val in enumerate(kmeans.cluster_centers_):
+    plt.scatter(x=val[0], y=val[1], s=100, marker='x', c='r' if index == 0 else 'g' if index == 1 else 'b')
+plt.show()
