@@ -58,5 +58,6 @@ f = Popen(f"./libsvm-3.32/tools/easy.py training.data testing.data", shell = Tru
 print("SVM Accuracy")
 for line in f:
     line = line.decode("utf-8")
-    if line.startswith("Accuracy"):
-        print(line)
+    if not line.startswith("b'[local]"):
+        if not len(line.strip()) == 0:
+            print(line)
