@@ -30,18 +30,17 @@ kMatrix = kFrame.values
 
 kmeans = KMeans(n_clusters=3, init="random", n_init=1).fit(kMatrix)
 
-c1 = []
-c2 = []
-c3 = []
+xCol = "sepal_length"
+yCol = "sepal_width"
 
 for index, val in enumerate(kmeans.labels_):
     if (val == 0):
-        plt.scatter(x=kFrame["sepal_length"].values[index], y=kFrame["sepal_width"].values[index], c='r')
+        plt.scatter(x=kFrame[xCol].values[index], y=kFrame[yCol].values[index], c='r')
     elif (val == 1):
-        plt.scatter(x=kFrame["sepal_length"].values[index], y=kFrame["sepal_width"].values[index], c='g')
+        plt.scatter(x=kFrame[xCol].values[index], y=kFrame[yCol].values[index], c='g')
     elif (val == 2):
-        plt.scatter(x=kFrame["sepal_length"].values[index], y=kFrame["sepal_width"].values[index], c='b')
+        plt.scatter(x=kFrame[xCol].values[index], y=kFrame[yCol].values[index], c='b')
 
 for index, val in enumerate(kmeans.cluster_centers_):
-    plt.scatter(x=val[0], y=val[1], s=100, marker='x', c='r' if index == 0 else 'g' if index == 1 else 'b')
+    plt.scatter(x=val[dataLabels.index(xCol)], y=val[dataLabels.index(yCol)], s=100, marker='x', c='r' if index == 0 else 'g' if index == 1 else 'b')
 plt.show()
