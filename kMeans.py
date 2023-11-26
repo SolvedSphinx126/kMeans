@@ -1,4 +1,6 @@
+#! /usr/bin/env python3
 # Import necessary libraries
+from subprocess import *
 import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
@@ -44,3 +46,17 @@ for index, val in enumerate(kmeans.labels_):
 for index, val in enumerate(kmeans.cluster_centers_):
     plt.scatter(x=val[dataLabels.index(xCol)], y=val[dataLabels.index(yCol)], s=100, marker='x', c='r' if index == 0 else 'g' if index == 1 else 'b')
 plt.show()
+
+trainingSample = int(150 * 0.8)
+
+Popen("./data_formatter.py", shell = True, stdout = PIPE).communicate()
+
+Popen(f"./libsvm-3.32/tools/subset.py iris_libsvm.data {trainingSample} training.data testing.data", shell = True, stdout = PIPE).communicate()
+
+f = Popen(f"./libsvm-3.32/tools/easy.py training.data testing.data", shell = True, stdout = PIPE).stdout
+
+print("SVM Accuracy")
+for line in f:
+    line = line.decode("utf-8")
+    if line.startswith("Accuracy"):
+        print(line)

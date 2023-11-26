@@ -1,9 +1,10 @@
+#! /usr/bin/env python3
 #Formatted data to be compliant with checkdata.py
 
-fileName = "iris.data"
+fileName = "./iris_data/iris.data"
 lineCount = 0
 
-with open(fileName, 'r') as input, open('iris.txt', 'w') as output:
+with open(fileName, 'r') as input, open('iris_libsvm.data', 'w') as output:
     for line in input:
         values = line.split(',')
         outputLine = ""

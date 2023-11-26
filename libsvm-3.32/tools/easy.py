@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import os
@@ -12,10 +12,10 @@ if len(sys.argv) <= 1:
 
 is_win32 = (sys.platform == 'win32')
 if not is_win32:
-    svmscale_exe = "../svm-scale"
-    svmtrain_exe = "../svm-train"
-    svmpredict_exe = "../svm-predict"
-    grid_py = "./grid.py"
+    svmscale_exe = "./libsvm-3.32/svm-scale"
+    svmtrain_exe = "./libsvm-3.32/svm-train"
+    svmpredict_exe = "./libsvm-3.32/svm-predict"
+    grid_py = "./libsvm-3.32/tools/grid.py"
     gnuplot_exe = "/usr/bin/gnuplot"
 else:
         # example for windows
@@ -55,6 +55,7 @@ f = Popen(cmd, shell = True, stdout = PIPE).stdout
 
 line = ''
 while True:
+    print(line)
     last_line = line
     line = f.readline()
     if not line: break
