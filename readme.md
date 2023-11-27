@@ -1,4 +1,4 @@
-This program was tested on Ubuntu (WSL) and Windows with Python 3.10
+This program was tested on Ubuntu (WSL) with Python 3.10
 
 This program depends on:
     numpy
